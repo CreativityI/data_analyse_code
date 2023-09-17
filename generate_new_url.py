@@ -35,13 +35,18 @@ def get_ego_lane_list(data_pd):
     return pd.DataFrame(unique_id_ego_lane_list)
 
 def data_process(data_pd):
+    print(data_pd.shape)
     data_pd = data_pd[['trip_id', 'start_time', 'end_time', 'ego_lane']].drop_duplicates(keep='first')
+    print(data_pd.shape)
     data_pd['unique_id'] = data_pd.apply(generate_unique_id, axis=1)
     data_pd['url'] = data_pd.apply(generate_new_url, axis=1)
 
     unique_id_ego_lane_pd = get_ego_lane_list(data_pd)
+    print(data_pd.shape)
     data_pd = data_pd[['trip_id', 'start_time', 'end_time', 'url', 'unique_id']].drop_duplicates(keep='first')
+    print(data_pd.shape)
     data_pd = pd.merge( data_pd, unique_id_ego_lane_pd, on=['unique_id'])
+    print(data_pd.shape)
     return data_pd[['trip_id', 'start_time', 'end_time', 'url', 'ego_lane']]
 
 
@@ -58,20 +63,24 @@ file_name_3 = 'job_id=76338856ac.csv'
 
 save_file_name = 'segment_tirp.csv'
 
+print(file_name_1)
 data_pd_1 = pd.read_csv(data_dir_path + file_name_1, sep=',')
+print(file_name_2)
 data_pd_2 = pd.read_csv(data_dir_path + file_name_2, sep=',')
+print(file_name_3)
 data_pd_3 = pd.read_csv(data_dir_path + file_name_3, sep=',')
 
+data_pd = pd.concat([data_pd_1, data_pd_2, data_pd_3], axis=0)
+result_data_pd = data_process(data_pd)
 
-print(file_name_1)
+# print(file_name_1)
+# result_data_pd_1 = data_process(data_pd_1)
+# print(file_name_2)
+# result_data_pd_2 = data_process(data_pd_2)
+# print(file_name_3)
+# result_data_pd_3 = data_process(data_pd_3)
 
-result_data_pd_1 = data_process(data_pd_1)
-print(file_name_2)
-result_data_pd_2 = data_process(data_pd_2)
-print(file_name_3)
-result_data_pd_3 = data_process(data_pd_3)
 
-
-result_data_pd = pd.concat([result_data_pd_1, result_data_pd_2, result_data_pd_3], axis=0)
+# result_data_pd = pd.concat([result_data_pd_1, result_data_pd_2, result_data_pd_3], axis=0)
 
 result_data_pd.to_csv(data_dir_path+save_file_name, sep=',', index=False)
